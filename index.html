@@ -1,0 +1,66 @@
+<button id="bgFetchButton">Store assets locally</button>
+<div id="progressStatus">Progress: waiting...</div>
+
+<script>
+  bgFetchButton = document.querySelector('#bgFetchButton');
+  progressStatus = document.querySelector('#progressStatus');
+
+  bgFetchButton.addEventListener('click', async event => {
+    // Let's assume that we got some unique ID of the asset set we want to download
+    let assetToFetchId = 'series';
+
+    try {
+      bgFetchButton.disabled = true;
+      const registration = await navigator.serviceWorker.ready;
+
+      // This could be an API call to our backend
+      let assetsDataResponse = await fetch(
+        `/assets/${assetToFetchId}-data.json`
+      );
+      let assetsData = await assetsDataResponse.json();
+
+      const bgFetchRegistration = await registration.backgroundFetch.fetch(
+        assetToFetchId,
+        assetsData.urls,
+        {
+          icons: assetsData.icons,
+          title: `Downloading ${assetsData.title}`,
+          downloadTotal: assetsData.downloadTotal
+        }
+      );
+
+      bgFetchRegistration.addEventListener('progress', event => {
+        fetchProgress = event.currentTarget;
+        progressStatus.innerHTML = `Progress: downloaded ${bytesToSize(
+          fetchProgress.downloaded
+        )}  from ${bytesToSize(fetchProgress.downloadTotal)} (${Math.round(
+          (fetchProgress.downloaded * 100) / fetchProgress.downloadTotal
+        )}%)`;
+
+        if (fetchProgress.downloadTotal == fetchProgress.downloaded) {
+          bgFetchButton.disabled = false;
+        }
+      });
+    } catch (err) {
+      alert(
+        'Please enable downloads for this website (click the icon on the right side of the address bar)'
+      );
+      console.error(err);
+    }
+  });
+
+  function bytesToSize(bytes, decimals) {
+    if (bytes == 0) return '0 Bytes';
+    var k = 1024,
+      dm = decimals <= 0 ? 0 : decimals || 2,
+      sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+      i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js');
+    });
+  }
+</script>

@@ -1,0 +1,19 @@
+{
+  "title": "My series",
+  "urls": [
+    "/assets/mobileera-group-2016.jpg",
+    "/assets/mobileera-group-2017.jpg",
+    "/assets/mobileera-group-2018.jpg",
+    "/assets/ngvikings-group-2017.jpg",
+    "/assets/ngvikings-group-2018.jpg"
+  ],
+  "downloadTotal": 2252730,
+  "icons": [
+    {
+      "src": "icon.png",
+      "size": "128x128",
+      "type": "image/png"
+    }
+  ],
+  "descriptionUrl": "https://medium.com/@webmaxru/background-fetch-api-get-ready-to-use-it-69cca522cd8f"
+}
